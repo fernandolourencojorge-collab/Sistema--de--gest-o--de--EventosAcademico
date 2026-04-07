@@ -7,8 +7,7 @@ CREATE TABLE Eventos (
     DataInicio DATE,
     DataFim DATE,
     Local VARCHAR(100),
-    Capacidade INT CHECK (Capacidade > 0),
-    PrecoInscricao DECIMAL(10,2) CHECK (PrecoInscricao >= 0)
+    Capacidade INT CHECK (Capacidade > 0)
 );
 
 CREATE TABLE Participantes (
@@ -41,20 +40,22 @@ CREATE TABLE Inscricoes (
     EventoID INT,
     DataInscricao DATE,
     FOREIGN KEY (ParticipanteID) REFERENCES Participantes(ParticipanteID),
-    FOREIGN KEY (EventoID) REFERENCES Eventos(EventoID)
+    FOREIGN KEY (EventoID) REFERENCES Eventos(EventoID),
+    PrecoInscricao DECIMAL(10,2) CHECK (PrecoInscricao >= 0)
 );
+
 select *from Eventos;
 select *from Oradores;
 select *from participantes;
 select *from Sessoes;
 select *from inscricoes;
 -- 5 eventos
-INSERT INTO Eventos (EventoID, Nome, DataInicio,DataFim, local,capacidade,PrecoInscricao) VALUES
-(1,'Conferência de Tecnologia','2025-06-10','2025-06-10','Luanda','200','2000'),
-(2,'Workshop de Bases de Dados','2025-06-15','2025-06-15','Benguela','100','5000'),
-(3,'Seminário de Inteligência Artificial','2025-06-20','2025-06-20','Huambo','50','15000'),
-(4,'Fórum de Empreendedorismo','2025-06-25','2025-06-25','Lubango','80','7000'),
-(5,'Congresso de Engenharia','2025-06-30','2025-06-30','Malanje','250','10000');
+INSERT INTO Eventos (EventoID, Nome, DataInicio,DataFim, local,capacidade) VALUES
+(1,'Conferência de Tecnologia','2025-06-10','2025-06-10','Luanda','200'),
+(2,'Workshop de Bases de Dados','2025-06-15','2025-06-15','Benguela','100'),
+(3,'Seminário de Inteligência Artificial','2025-06-20','2025-06-20','Huambo','50'),
+(4,'Fórum de Empreendedorismo','2025-06-25','2025-06-25','Lubango','80'),
+(5,'Congresso de Engenharia','2025-06-30','2025-06-30','Malanje','250');
 -- 10 Oradores
 INSERT INTO Oradores (OradorID, NomeOrador,Especialidade, email) VALUES
 (1,'Dr. João Manuel','Docente','joaogmail.com'),
@@ -84,31 +85,31 @@ INSERT INTO Sessoes (SessaoID,Titulo,DataHora,EventoID, OradorID) VALUES
 
 
 -- 30 inscrições
-INSERT INTO Inscricoes (ParticipanteID, EventoID, DataInscricao) VALUES
+INSERT INTO Inscricoes (InscricaoID,ParticipanteID, EventoID, DataInscricao,PrecoInscricao) VALUES
 
 -- Evento 1 (8 participantes)
-(1,1,'2025-05-01'),(2,1,'2025-05-01'),(3,1,'2025-05-01'),
-(4,1,'2025-05-01'),(5,1,'2025-05-01'),(6,1,'2025-05-01'),
-(7,1,'2025-05-01'),(8,1,'2025-05-01'),
+(1,1,1,'2025-05-01','2500'),(2,2,1,'2025-05-01','3000'),(3,3,1,'2025-05-01','1000'),
+(4,4,1,'2025-05-01','3500'),(5,5,1,'2025-05-01','3600'),(6,6,1,'2025-05-01','1200'),
+(7,7,1,'2025-05-01','3000'),(8,8,1,'2025-05-01','2600'),
 
 -- Evento 2 (6 participantes)
-(2,2,'2025-05-02'),(3,2,'2025-05-02'),(4,2,'2025-05-02'),
-(5,2,'2025-05-02'),(6,2,'2025-05-02'),(7,2,'2025-05-02'),
+(9,2,2,'2025-05-02','4000'),(10,3,2,'2025-05-02','4500'),(11,4,2,'2025-05-02','1300'),
+(12,5,2,'2025-05-02','5000'),(13,6,2,'2025-05-02','5500'),(14,7,2,'2025-05-02','1400'),
 
 -- Evento 3 (7 participantes)
-(8,3,'2025-05-03'),(9,3,'2025-05-03'),(10,3,'2025-05-03'),
-(11,3,'2025-05-03'),(12,3,'2025-05-03'),
-(13,3,'2025-05-03'),(14,3,'2025-05-03'),
+(15,8,3,'2025-05-03','6000'),(16,9,3,'2025-05-03','6600'),(17,10,3,'2025-05-03','1500'),
+(18,11,3,'2025-05-03','7000'),(19,12,3,'2025-05-03','1600'),
+(20,13,3,'2025-05-03','7500'),(21,14,3,'2025-05-03','1700'),
 
 -- Evento 4 (5 participantes)
-(15,4,'2025-05-04'),(16,4,'2025-05-04'),
-(17,4,'2025-05-04'),(18,4,'2025-05-04'),
-(19,4,'2025-05-04'),
+(22,15,4,'2025-05-04','8000'),(23,16,4,'2025-05-04','1800'),
+(24,17,4,'2025-05-04','8500'),(25,18,4,'2025-05-04','1900'),
+(26,19,4,'2025-05-04','1000'),
 
 -- Evento 5 (6 participantes)
-(10,5,'2025-05-05'),(11,5,'2025-05-05'),
-(12,5,'2025-05-05'),(13,5,'2025-05-05'),
-(14,5,'2025-05-05'),(20,5,'2025-05-05'); 
+(27,10,5,'2025-05-05','1500'),(28,11,5,'2025-05-05','2000'),
+(29,12,5,'2025-05-05','200'),(30,13,5,'2025-05-05','2200'),
+(31,14,5,'2025-05-05','2500'),(32,20,5,'2025-05-05','2500'); 
 -- i. Listar todos os eventos com os seus oradores e o número total de participantes inscritos.
  SELECT 
     E.Nome AS Evento,
@@ -145,11 +146,11 @@ SELECT
     E.EventoID,
     E.Nome AS Evento,
     COUNT(I.InscricaoID) AS TotalInscricoes,
-    E.PrecoInscricao,
-    COUNT(I.InscricaoID) * E.PrecoInscricao AS ReceitaTotal
+    I.PrecoInscricao,
+    COUNT(I.InscricaoID) * I.PrecoInscricao AS ReceitaTotal
 FROM Eventos E
 LEFT JOIN Inscricoes I ON E.EventoID = I.EventoID
-GROUP BY E.EventoID, E.Nome, E.PrecoInscricao;
+GROUP BY E.EventoID, E.Nome, I.PrecoInscricao;
 -- v. Identificar oradores que participam em eventos em mais de uma cidade. 
 SELECT 
     O.OradorID,
@@ -160,3 +161,4 @@ JOIN Sessoes S ON O.OradorID = S.OradorID
 JOIN Eventos E ON S.EventoID = E.EventoID
 GROUP BY O.OradorID, O.NomeOrador
 HAVING COUNT(DISTINCT E.Local) > 1;
+
